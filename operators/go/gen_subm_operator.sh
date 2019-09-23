@@ -8,8 +8,6 @@ export GO111MODULE=on
 GOPATH=$HOME/go
 
 version=0.0.1
-add_engine=true
-add_routeagent=true
 openapi_checks_enabled=false
 push_image=false
 op_dir=$GOPATH/src/github.com/submariner-operator/submariner-operator
@@ -32,7 +30,7 @@ function setup_prereqs(){
   kubectl config use-context kubernetes-admin@kind
 }
 
-function initilize_subm_operator() {
+function initialize_subm_operator() {
   mkdir -p $op_dir
   pushd $op_dir/..
   rm -rf $op_dir
@@ -156,9 +154,10 @@ function build_subm_operator() {
   pushd $op_dir
   go mod vendor
   # This seems like a bug in operator-sdk, that this is needed?
-  go get k8s.io/kube-state-metrics/pkg/collector
-  go get k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1
-  go get github.com/coreos/prometheus-operator/pkg/apis/monitoring
+  # NB: These fail for some people with missing "latest" tag error
+  go get k8s.io/kube-state-metrics/pkg/collector || true
+  go get k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1 || true
+  go get github.com/coreos/prometheus-operator/pkg/apis/monitoring ||
 
   operator-sdk build quay.io/submariner/submariner-operator:$version --verbose
   if [[ $push_image = true ]]; then
@@ -179,14 +178,9 @@ function export_subm_op() {
 setup_prereqs
 
 # Create SubM Operator
-initilize_subm_operator
-if [[ $add_engine = true ]]; then
-  add_subm_engine_to_operator
-fi
-if [[ $add_routeagent = true ]]; then
-  # WIP
-  add_subm_routeagent_to_operator
-fi
+initialize_subm_operator
+add_subm_engine_to_operator
+add_subm_routeagent_to_operator
 build_subm_operator
 
 export_subm_op

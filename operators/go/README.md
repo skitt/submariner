@@ -1,6 +1,6 @@
 ## Submariner Operator
 
-Experiential Submariner Operator.
+Experimental Submariner Operator.
 
 ### Generating the Operator
 

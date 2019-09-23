@@ -19,15 +19,24 @@ fi
 
 GOPATH=$HOME/go
 subm_op_dir=$GOPATH/src/github.com/submariner-operator/submariner-operator
-subm_op_scr_dir=../operators/go/submariner-operator
+subm_op_src_dir=../operators/go/submariner-operator
 mkdir -p $subm_op_dir
 
-cp -a $subm_op_scr_dir/. $subm_op_dir/
+cp -a $subm_op_src_dir/. $subm_op_dir/
 
 subm_ns=operators
 subm_broker_ns=submariner-k8s-broker
 
 export GO111MODULE=on
+
+function create_resource_if_missing() {
+  resource_type=$1
+  resource_name=$2
+  resource_yaml=$3
+  if ! kubectl get --namespace=$subm_ns $resource_type $resource_name; then
+    kubectl create --namespace=$subm_ns -f $resource_yaml
+  fi
+}
 
 function add_subm_gateway_label() {
   kubectl label node $context-worker "submariner.io/gateway=true" --overwrite
@@ -57,9 +66,7 @@ EOF
 
   # Create clusters CRD
   # NB: This must be done before submariner-engine pod is deployed
-  if ! kubectl get crds | grep clusters.submariner.io; then
-    kubectl create -f $clusters_crd_file
-  fi
+  create_resource_if_missing crd clusters.submariner.io $clusters_crd_file
 
   popd
 }
@@ -89,9 +96,7 @@ EOF
 
   # Create endpoints CRD
   # NB: This must be done before submariner-engine pod is deployed
-  if ! kubectl get crds | grep endpoints.submariner.io; then
-    kubectl create -f $endpoints_crd_file
-  fi
+  create_resource_if_missing crd endpoints.submariner.io $endpoints_crd_file
 
   popd
 }
@@ -120,9 +125,7 @@ EOF
   cat $routeagents_crd_file
 
   # Create routeagents CRD
-  if ! kubectl get crds | grep routeagents.submariner.io; then
-    kubectl create -f $routeagents_crd_file
-  fi
+  create_resource_if_missing crd routeagents.submariner.io $routeagents_crd_file
 
   popd
 }
@@ -141,28 +144,21 @@ function deploy_subm_operator() {
   fi
 
   if ! kubectl get crds | grep submariners.submariner.io; then
-    kubectl create -f deploy/crds/submariner_v1alpha1_submariner_crd.yaml
+    # FIXME: Some people consistently get one of these, others get the other
+    kubectl create -f deploy/crds/submariner_v1alpha1_submariner_crd.yaml || kubectl create -f deploy/crds/submariner.io_v1alpha1_submariner_crd.yaml
   fi
 
   # Create SubM Operator service account if it doesn't exist
-  if ! kubectl get sa --namespace=$subm_ns submariner-operator; then
-    kubectl create --namespace=$subm_ns -f deploy/service_account.yaml
-  fi
+  create_resource_if_missing sa submariner-operator deploy/service_account.yaml
 
   # Create SubM Operator role if it doesn't exist
-  if ! kubectl get roles --namespace=$subm_ns submariner-operator; then
-    kubectl create --namespace=$subm_ns -f deploy/role.yaml
-  fi
+  create_resource_if_missing role submariner-operator deploy/role.yaml
 
   # Create SubM Operator role binding if it doesn't exist
-  if ! kubectl get rolebindings --namespace=$subm_ns submariner-operator; then
-    kubectl create --namespace=$subm_ns -f deploy/role_binding.yaml
-  fi
+  create_resource_if_missing rolebinding submariner-operator deploy/role_binding.yaml
 
   # Create SubM Operator deployment if it doesn't exist
-  if ! kubectl get deployments --namespace=$subm_ns submariner-operator; then
-    kubectl create --namespace=$subm_ns -f deploy/operator.yaml
-  fi
+  create_resource_if_missing deployment submariner-operator deploy/operator.yaml
 
   # Wait for SubM Operator pod to be ready
   kubectl wait --for=condition=Ready pods -l name=submariner-operator --timeout=120s --namespace=$subm_ns
