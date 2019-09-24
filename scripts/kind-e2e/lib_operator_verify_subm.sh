@@ -1,4 +1,8 @@
-set -ex
+# This should only be sourced
+if [ "${0##*/}" = "lib_operator_verify_subm.sh" ]; then
+    echo "Don't run me, source me" >&2
+    exit 1
+fi
 
 function verify_subm_gateway_label() {
   kubectl get node $context-worker -o jsonpath='{.metadata.labels}' | grep submariner.io/gateway:true
