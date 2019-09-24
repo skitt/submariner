@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source $(dirname $0)/lib/debug_functions
+
+cd $(dirname $0)
+
+GOFLAGS=""
+
+cd ../operators/go
+./gen_subm_operator.sh
