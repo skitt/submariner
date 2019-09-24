@@ -24,9 +24,6 @@ mkdir -p $subm_op_dir
 
 cp -a $subm_op_src_dir/. $subm_op_dir/
 
-subm_ns=operators
-subm_broker_ns=submariner-k8s-broker
-
 export GO111MODULE=on
 
 function create_resource_if_missing() {
@@ -164,36 +161,6 @@ function deploy_subm_operator() {
   kubectl wait --for=condition=Ready pods -l name=submariner-operator --timeout=120s --namespace=$subm_ns
 
   popd
-}
-
-function create_subm_vars() {
-  # FIXME A better name might be submariner-engine, but just kinda-matching submariner-<random hash> name used by Helm/upstream tests
-  deployment_name=submariner
-  operator_deployment_name=submariner-operator
-  engine_deployment_name=submariner-engine
-  routeagent_deployment_name=submariner-routeagent
-  broker_deployment_name=submariner-k8s-broker
-
-  clusterCidr_cluster2=10.245.0.0/16
-  clusterCidr_cluster3=10.246.0.0/16
-  serviceCidr_cluster2=100.95.0.0/16
-  serviceCidr_cluster3=100.96.0.0/16
-  natEnabled=false
-  subm_routeagent_image_repo=submariner-route-agent
-  subm_routeagent_image_tag=local
-  subm_routeagent_image_policy=IfNotPresent
-  subm_engine_image_repo=submariner
-  subm_engine_image_tag=local
-  subm_engine_image_policy=IfNotPresent
-  # FIXME: Actually act on this size request in controller
-  subm_engine_size=3
-  subm_colorcodes=blue
-  subm_debug=false
-  subm_broker=k8s
-  ce_ipsec_debug=false
-  # FIXME: This seems to be empty with default Helm deploys?
-  # FIXME: Clarify broker token vs sumb psk
-  subm_token=$SUBMARINER_BROKER_TOKEN
 }
 
 # FIXME: Call this submariner-engine vs submariner?

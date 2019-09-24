@@ -3,11 +3,6 @@ set -em
 
 source $(git rev-parse --show-toplevel)/scripts/lib/debug_functions
 
-# Import functions for deploying/testing with Operator
-# NB: These are also used to verify non-Operator deployments, thereby asserting the two are mostly equivalent
-. kind-e2e/lib_operator_deploy_subm.sh
-. kind-e2e/lib_operator_verify_subm.sh
-
 ### Functions ###
 
 function kind_clusters() {
@@ -204,6 +199,39 @@ function kind_import_images() {
     done
 }
 
+function create_subm_vars() {
+  # FIXME A better name might be submariner-engine, but just kinda-matching submariner-<random hash> name used by Helm/upstream tests
+  deployment_name=submariner
+  operator_deployment_name=submariner-operator
+  engine_deployment_name=submariner-engine
+  routeagent_deployment_name=submariner-routeagent
+  broker_deployment_name=submariner-k8s-broker
+
+  clusterCidr_cluster2=10.245.0.0/16
+  clusterCidr_cluster3=10.246.0.0/16
+  serviceCidr_cluster2=100.95.0.0/16
+  serviceCidr_cluster3=100.96.0.0/16
+  natEnabled=false
+  subm_routeagent_image_repo=submariner-route-agent
+  subm_routeagent_image_tag=local
+  subm_routeagent_image_policy=IfNotPresent
+  subm_engine_image_repo=submariner
+  subm_engine_image_tag=local
+  subm_engine_image_policy=IfNotPresent
+  # FIXME: Actually act on this size request in controller
+  subm_engine_size=3
+  subm_colorcodes=blue
+  subm_debug=false
+  subm_broker=k8s
+  ce_ipsec_debug=false
+  # FIXME: This seems to be empty with default Helm deploys?
+  # FIXME: Clarify broker token vs sumb psk
+  subm_token=$SUBMARINER_BROKER_TOKEN
+
+  subm_ns=operators
+  subm_broker_ns=submariner-k8s-broker
+}
+
 function test_connection() {
     nginx_svc_ip_cluster3=$(kubectl --context=cluster3 get svc -l app=nginx-demo | awk 'FNR == 2 {print $3}')
     netshoot_pod=$(kubectl --context=cluster2 get pods -l app=netshoot | awk 'FNR == 2 {print $1}')
@@ -335,16 +363,23 @@ install_helm
 if [[ $4 = true ]]; then
     enable_kubefed
 fi
+
 kind_import_images
 setup_broker
-# Verify SubM Broker secrets
+
 context=cluster1
 kubectl config use-context $context
+
+# Import functions for testing with Operator
+# NB: These are also used to verify non-Operator deployments, thereby asserting the two are mostly equivalent
+. kind-e2e/lib_operator_verify_subm.sh
+
 create_subm_vars
 verify_subm_broker_secrets
 
 if [[ $5 = operator ]]; then
     operator=true
+    . kind-e2e/lib_operator_deploy_subm.sh
 
     for i in 2 3; do
       context=cluster$i
@@ -374,9 +409,6 @@ if [[ $5 = operator ]]; then
       verify_subm_op_pod
       # Verify SubM Operator container
       verify_subm_operator_container
-
-      # Collect SubM vars for use in SubM CRs
-      create_subm_vars
 
       # FIXME: Rename all of these submariner-engine or engine, vs submariner
       # Create SubM CR
@@ -412,18 +444,17 @@ elif [[ $5 = helm ]]; then
     helm=true
     setup_cluster2_gateway
     setup_cluster3_gateway
-    for i in 2 3; do
-      context=cluster$i
-      kubectl config use-context $context
-
-      create_subm_vars
-      verify_subm_engine_pod
-      verify_subm_routeagent_pod
-      verify_subm_engine_container
-      verify_subm_routeagent_container
-      verify_subm_engine_secrets
-      verify_subm_routeagent_secrets
-    done
+#    for i in 2 3; do
+#      context=cluster$i
+#      kubectl config use-context $context
+#
+#      verify_subm_engine_pod
+#      verify_subm_routeagent_pod
+#      verify_subm_engine_container
+#      verify_subm_routeagent_container
+#      verify_subm_engine_secrets
+#      verify_subm_routeagent_secrets
+#    done
 fi
 
 test_connection
