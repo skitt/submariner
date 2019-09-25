@@ -101,7 +101,7 @@ EOF
 function create_routeagents_crd() {
   pushd $subm_op_dir
 
-  routeagents_crd_file=deploy/crds/submariner_routeagents_crd.yaml
+  routeagents_crd_file=deploy/crds/submariner.io_routeagents_crd.yaml
 
   # TODO: Can/should we create this with Op-SDK?
 cat <<EOF > $routeagents_crd_file
@@ -141,8 +141,7 @@ function deploy_subm_operator() {
   fi
 
   if ! kubectl get crds | grep submariners.submariner.io; then
-    # FIXME: Some people consistently get one of these, others get the other
-    kubectl create -f deploy/crds/submariner_v1alpha1_submariner_crd.yaml || kubectl create -f deploy/crds/submariner.io_v1alpha1_submariner_crd.yaml
+    kubectl create -f deploy/crds/submariner.io_submariners_crd.yaml
   fi
 
   # Create SubM Operator service account if it doesn't exist
@@ -167,7 +166,7 @@ function deploy_subm_operator() {
 function create_subm_cr() {
   pushd $subm_op_dir
 
-  cr_file_base=deploy/crds/submariner_v1alpha1_submariner_cr.yaml
+  cr_file_base=deploy/crds/submariner.io_v1alpha1_submariner_cr.yaml
   cr_file=deploy/crds/submariner-cr-$context.yaml
 
   # Create copy of default SubM CR (from operator-sdk)
@@ -221,7 +220,7 @@ function create_routeagent_cr() {
 
   cr_file=deploy/crds/routeagent-cr-$context.yaml
 
-  cp deploy/crds/submariner_v1alpha1_routeagent_cr.yaml $cr_file
+  cp deploy/crds/submariner.io_v1alpha1_routeagent_cr.yaml $cr_file
 
   sed -i "s|name: example-routeagent|name: $routeagent_deployment_name|g" $cr_file
 

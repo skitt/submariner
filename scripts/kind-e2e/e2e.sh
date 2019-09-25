@@ -58,6 +58,12 @@ function install_helm() {
     pids=(-1 -1 -1)
     logs=()
     for i in 1 2 3; do
+        # Skip other clusters on operator deployment, we only need it on the first
+        if [ "$i" != 1 ] && [ "$deploy_operator" = true ]; then
+            echo "Skipping other clusters since we're deploying with operator."
+            break
+        fi
+
         if kubectl --context=cluster${i} -n kube-system rollout status deploy/tiller-deploy > /dev/null 2>&1; then
             echo Helm already installed on cluster${i}, skipping helm installation...
         else
@@ -344,6 +350,11 @@ if [[ $1 != keep ]]; then
     trap cleanup EXIT
 fi
 
+if [ "$5" = operator ]; then
+   echo Deploying with operator
+   deploy_operator=true
+fi
+
 echo Starting with status: $1, k8s_version: $2, logging: $3, kubefed: $4.
 PRJ_ROOT=$(git rev-parse --show-toplevel)
 mkdir -p ${PRJ_ROOT}/output/kind-config/dapper/ ${PRJ_ROOT}/output/kind-config/local-dev/
@@ -377,8 +388,7 @@ kubectl config use-context $context
 create_subm_vars
 verify_subm_broker_secrets
 
-if [[ $5 = operator ]]; then
-    operator=true
+if [ "$deploy_operator" = true ]; then
     . kind-e2e/lib_operator_deploy_subm.sh
 
     for i in 2 3; do
