@@ -134,8 +134,12 @@ func newPodForCR(cr *submarinerv1alpha1.Submariner) *corev1.Pod {
 		"app": "submariner-engine",
 	}
 
-	// Create SecurityContext for Pod
-	security_context_add_net_admin := corev1.SecurityContext{Capabilities: &corev1.Capabilities{Add: []corev1.Capability{"NET_ADMIN"}}}
+	// Create privilaged security context for Engine pod
+	// FIXME: Seems like these have to be a var, so can pass pointer to bool var to SecurityContext. Cleaner option?
+	allow_privilege_escalation := true
+	privileged := true
+	run_as_non_root := false
+	security_context_all_caps_privilaged := corev1.SecurityContext{Capabilities: &corev1.Capabilities{Add: []corev1.Capability{"ALL"}}, AllowPrivilegeEscalation: &allow_privilege_escalation, Privileged: &privileged, RunAsNonRoot: &run_as_non_root}
 
 	// Create Pod
 	return &corev1.Pod{
@@ -152,7 +156,7 @@ func newPodForCR(cr *submarinerv1alpha1.Submariner) *corev1.Pod {
 					Image: "submariner:local",
 					// TODO: Use var here
 					Command:         []string{"submariner.sh"},
-					SecurityContext: &security_context_add_net_admin,
+					SecurityContext: &security_context_all_caps_privilaged,
 					Env: []corev1.EnvVar{
 						{Name: "SUBMARINER_NAMESPACE", Value: cr.Spec.SubmarinerNamespace},
 						{Name: "SUBMARINER_CLUSTERCIDR", Value: cr.Spec.SubmarinerClustercidr},
