@@ -157,7 +157,7 @@ function build_subm_operator() {
   # NB: These fail for some people with missing "latest" tag error
   go get k8s.io/kube-state-metrics/pkg/collector || true
   go get k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1 || true
-  go get github.com/coreos/prometheus-operator/pkg/apis/monitoring ||
+  go get github.com/coreos/prometheus-operator/pkg/apis/monitoring || true
 
   operator-sdk build quay.io/submariner/submariner-operator:$version --verbose
   if [[ $push_image = true ]]; then
