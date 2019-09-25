@@ -369,7 +369,19 @@ function verify_subm_routeagent_container() {
 }
 
 function verify_subm_broker_secrets() {
-  # Show all SubM secrets
+  # Wait for secrets to be created
+  SECONDS="0"
+  while ! kubectl get secret -n $subm_broker_ns | grep -q submariner-; do
+    if [ $SECONDS -gt 30 ]; then
+        echo "Timeout waiting for SubM Secret creation"
+        exit 1
+    else
+        ((SECONDS+=2))
+        sleep 2
+    fi
+  done
+
+  # Show all SubM broker secrets
   kubectl get secrets -n $subm_broker_ns
 
   subm_broker_secret_name=$(kubectl get secrets -n $subm_broker_ns -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='$broker_deployment_name-client')].metadata.name}")
@@ -394,6 +406,18 @@ function verify_subm_broker_secrets() {
 }
 
 function verify_subm_engine_secrets() {
+  # Wait for secrets to be created
+  SECONDS="0"
+  while ! kubectl get secret -n $subm_ns | grep -q submariner-; do
+    if [ $SECONDS -gt 30 ]; then
+        echo "Timeout waiting for SubM Secret creation"
+        exit 1
+    else
+        ((SECONDS+=2))
+        sleep 2
+    fi
+  done
+
   # Show all SubM secrets
   kubectl get secrets -n $subm_ns
 
@@ -427,6 +451,18 @@ function verify_subm_engine_secrets() {
 }
 
 function verify_subm_routeagent_secrets() {
+  # Wait for secrets to be created
+  SECONDS="0"
+  while ! kubectl get secret -n $subm_ns | grep -q submariner-; do
+    if [ $SECONDS -gt 30 ]; then
+        echo "Timeout waiting for SubM Secret creation"
+        exit 1
+    else
+        ((SECONDS+=2))
+        sleep 2
+    fi
+  done
+
   # Show all SubM secrets
   kubectl get secrets -n $subm_ns
 
