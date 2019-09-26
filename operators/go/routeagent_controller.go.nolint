@@ -150,6 +150,9 @@ func newPodForCR(cr *submarinerv1alpha1.Routeagent) *corev1.Pod {
 					// FIXME: Should be entrypoint script, find/use correct file for routeagent
 					Command:         []string{"submariner-route-agent.sh"},
 					SecurityContext: &security_context_all_cap_allow_escal,
+					VolumeMounts: []corev1.VolumeMount{
+						{Name: "host-slash", MountPath: "/host", ReadOnly: true},
+					},
 					Env: []corev1.EnvVar{
 						{Name: "SUBMARINER_NAMESPACE", Value: cr.Spec.SubmarinerNamespace},
 						{Name: "SUBMARINER_CLUSTERID", Value: cr.Spec.SubmarinerClusterid},
@@ -160,6 +163,9 @@ func newPodForCR(cr *submarinerv1alpha1.Routeagent) *corev1.Pod {
 			// TODO: Use SA submariner-routeagent or submariner?
 			ServiceAccountName: "submariner-operator",
 			HostNetwork:        true,
+			Volumes: []corev1.Volume{
+				{Name: "host-slash", VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/"}}},
+			},
 		},
 	}
 }
