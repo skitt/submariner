@@ -3,8 +3,6 @@ set -em
 
 source $(git rev-parse --show-toplevel)/scripts/lib/debug_functions
 
-deploytool=$5
-
 ### Functions ###
 
 function kind_clusters() {
@@ -200,7 +198,7 @@ function kind_import_images() {
     docker tag rancher/submariner:dev submariner:local
     docker tag rancher/submariner-route-agent:dev submariner-route-agent:local
 
-    if [[ $deploytool = operator ]]; then
+    if [[ "$deploy_operator" = true ]]; then
        docker tag quay.io/submariner/submariner-operator:dev submariner-operator:local
     fi
 
@@ -208,7 +206,7 @@ function kind_import_images() {
         echo "Loading submariner images in to cluster${i}..."
         kind --name cluster${i} load docker-image submariner:local
         kind --name cluster${i} load docker-image submariner-route-agent:local
-        if [[ $deploytool = operator ]]; then
+        if [[ "$deploy_operator" = true ]]; then
              kind --name cluster${i} load docker-image submariner-operator:local
 	fi
     done
@@ -459,7 +457,7 @@ if [ "$deploy_operator" = true ]; then
 
     deploy_netshoot_cluster2
     deploy_nginx_cluster3
-elif [[ $deploytool = helm ]]; then
+elif [[ $5 = helm ]]; then
     helm=true
     setup_cluster2_gateway
     setup_cluster3_gateway

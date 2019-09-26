@@ -5,8 +5,6 @@ if [ "${0##*/}" = "lib_operator_deploy_subm.sh" ]; then
 fi
 
 openapi_checks_enabled=false
-subm_ns=operators
-subm_broker_ns=submariner-k8s-broker
 subm_op_src_dir=$(realpath ../operators/go/submariner-operator)
 subm_op_dir=$subm_op_src_dir
 

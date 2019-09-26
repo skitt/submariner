@@ -45,6 +45,9 @@ RUN apt-get -q update && \
     GOFLAGS="" go get -v github.com/onsi/ginkgo/ginkgo && \
     GOFLAGS="" go get -v golang.org/x/tools/cmd/goimports
 
+# TODO(mangelajo): the operator-sdk install guide recommends go get -d , but that doesn't pull
+# the sources where we expect. We need to figure out what's going on and remove the git clone
+# hack.
 RUN OP_FRAMEWORK="$GOPATH/src/github.com/operator-framework" && \
     mkdir -p $OP_FRAMEWORK && cd $OP_FRAMEWORK && \
     git clone https://github.com/operator-framework/operator-sdk && \

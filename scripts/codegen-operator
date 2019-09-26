@@ -1,10 +1,8 @@
 #!/bin/bash
 
 source $(dirname $0)/lib/debug_functions
+cd $(dirname $0)/../operators/go
 
-cd $(dirname $0)
-
-GOFLAGS=""
-
-cd ../operators/go
+# generation script does not expect vendoring mode
+export GOFLAGS=""
 ./gen_subm_operator.sh

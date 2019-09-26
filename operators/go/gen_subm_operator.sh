@@ -15,14 +15,6 @@ op_gen_dir=$(pwd)
 op_out_dir=$op_gen_dir/submariner-operator
 
 function setup_prereqs(){
-  if ! command -v dep; then
-    # Install dep
-    curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
-    # Make sure go/bin is in path
-    command -v dep
-  fi
-
   # NB: There must be a running K8s cluster pointed at by the exported KUBECONFIG
   # for operator-sdk to work (although this dependency doesn't make sense)
   kind delete cluster || true # make sure any pre-existing cluster is removed, otherwise it fails in dapper
