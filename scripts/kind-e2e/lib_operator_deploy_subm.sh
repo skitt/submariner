@@ -5,30 +5,10 @@ if [ "${0##*/}" = "lib_operator_deploy_subm.sh" ]; then
 fi
 
 openapi_checks_enabled=false
-
-# FIXME: Extract these into a setup prereqs function
-if ! command -v go; then
-  curl https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz -o go.tar.gz
-  tar -xf go.tar.gz
-  cp go /usr/local/bin/go
-fi
-
-if ! command -v dep; then
-  # Install dep
-  curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
-  # Make sure go/bin is in path
-  command -v dep
-fi
-
-GOPATH=$HOME/go
-subm_op_dir=$GOPATH/src/github.com/submariner-operator/submariner-operator
-subm_op_src_dir=../operators/go/submariner-operator
-mkdir -p $subm_op_dir
-
-cp -a $subm_op_src_dir/. $subm_op_dir/
-
-export GO111MODULE=on
+subm_ns=operators
+subm_broker_ns=submariner-k8s-broker
+subm_op_src_dir=$(realpath ../operators/go/submariner-operator)
+subm_op_dir=$subm_op_src_dir
 
 function create_resource_if_missing() {
   resource_type=$1
@@ -158,7 +138,7 @@ function deploy_subm_operator() {
   create_resource_if_missing rolebinding submariner-operator deploy/role_binding.yaml
 
   # Create SubM Operator deployment if it doesn't exist
-  create_resource_if_missing deployment submariner-operator deploy/operator.yaml
+  create_resource_if_missing deployment submariner-operator ../deploy-operator-local.yml
 
   # Wait for SubM Operator pod to be ready
   kubectl wait --for=condition=Ready pods -l name=submariner-operator --timeout=120s --namespace=$subm_ns
