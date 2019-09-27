@@ -237,6 +237,8 @@ function create_subm_vars() {
   subm_debug=false
   subm_broker=k8s
   ce_ipsec_debug=false
+  ce_ipsec_ikeport=501
+  ce_ipsec_nattport=4501
   # FIXME: This seems to be empty with default Helm deploys?
   # FIXME: Clarify broker token vs sumb psk
   subm_token=$SUBMARINER_BROKER_TOKEN

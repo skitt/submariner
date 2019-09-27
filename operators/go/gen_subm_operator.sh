@@ -75,6 +75,8 @@ function add_subm_engine_to_operator() {
   sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sCA string `json:"brokerK8sCA"`' $types_file
   sed -i '/SubmarinerSpec struct/a \ \ CeIpsecPSK string `json:"ceIPSecPSK"`' $types_file
   sed -i '/SubmarinerSpec struct/a \ \ CeIpsecDebug string `json:"ceIPSecDebug"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ CeIPSecIKEPort int `json:"ceIPSecIKEPort,omitempty"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ CeIPSecNATTPort int `json:"ceIPSecNATTPort,omitempty"`' $types_file
 
   # Define status fields, commented example
   # sed -i '/SubmarinerStatus struct/a \ \ PodNames []string `json:"pod_names"`' $types_file

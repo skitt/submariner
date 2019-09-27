@@ -2,6 +2,7 @@ package submariner
 
 import (
 	"context"
+	"strconv"
 
 	submarinerv1alpha1 "github.com/submariner-operator/submariner-operator/pkg/apis/submariner/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -142,7 +143,7 @@ func newPodForCR(cr *submarinerv1alpha1.Submariner) *corev1.Pod {
 	security_context_all_caps_privilaged := corev1.SecurityContext{Capabilities: &corev1.Capabilities{Add: []corev1.Capability{"ALL"}}, AllowPrivilegeEscalation: &allow_privilege_escalation, Privileged: &privileged, RunAsNonRoot: &run_as_non_root}
 
 	// Create Pod
-	return &corev1.Pod{
+	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cr.Name + "-pod",
 			Namespace: cr.Namespace,
@@ -181,4 +182,15 @@ func newPodForCR(cr *submarinerv1alpha1.Submariner) *corev1.Pod {
 			HostNetwork:        true,
 		},
 	}
+    if cr.Spec.CeIPSecIKEPort != 0 {
+        pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env,
+            corev1.EnvVar{Name: "CE_IPSEC_IKEPORT", Value: strconv.Itoa(cr.Spec.CeIPSecIKEPort)})
+    }
+
+    if cr.Spec.CeIPSecNATTPort != 0 {
+        pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env,
+            corev1.EnvVar{Name: "CE_IPSEC_NATTPORT", Value: strconv.Itoa(cr.Spec.CeIPSecNATTPort)})
+    }
+
+    return pod
 }
