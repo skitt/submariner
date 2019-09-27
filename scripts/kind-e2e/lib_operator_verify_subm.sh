@@ -175,6 +175,13 @@ function verify_routeagent_cr() {
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.image}' | grep $subm_routeagent_image_repo:$subm_routeagent_image_tag
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_namespace}' | grep $subm_ns
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_debug}' | grep $subm_debug
+  if [[ $context = cluster2 ]]; then
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_servicecidr}' | grep $serviceCidr_cluster2
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clustercidr}' | grep $clusterCidr_cluster2
+  elif [[ $context = cluster3 ]]; then
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_servicecidr}' | grep $serviceCidr_cluster3
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clustercidr}' | grep $clusterCidr_cluster3
+  fi
 }
 
 function verify_subm_op_pod() {
@@ -254,6 +261,13 @@ function verify_subm_routeagent_pod() {
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_NAMESPACE value:$subm_ns"
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERID value:$context"
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_DEBUG value:$subm_debug"
+    if [[ $context = cluster2 ]]; then
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCidr_cluster2"
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCidr_cluster2"
+    elif [[ $context = cluster3 ]]; then
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCidr_cluster3"
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCidr_cluster3"
+    fi
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..volumeMounts}' | grep "mountPath:/host"
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..volumeMounts}' | grep "name:host-slash"
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..volumeMounts}' | grep "readOnly:true"
@@ -363,6 +377,13 @@ function verify_subm_routeagent_container() {
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_NAMESPACE=$subm_ns"
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERID=$context"
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_DEBUG=$subm_debug"
+    if [[ $context = cluster2 ]]; then
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCidr_cluster2"
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCidr_cluster2"
+    elif [[ $context = cluster3 ]]; then
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCidr_cluster3"
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCidr_cluster3"
+    fi
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "HOME=/root"
 
     # Verify the routeagent binary is in the expected place and in PATH

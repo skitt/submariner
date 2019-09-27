@@ -210,6 +210,13 @@ function create_routeagent_cr() {
   sed -i "/spec:/a \ \ submariner_namespace: $subm_ns" $cr_file
   sed -i "/spec:/a \ \ submariner_clusterid: $context" $cr_file
   sed -i "/spec:/a \ \ submariner_debug: \"$subm_debug\"" $cr_file
+  if [[ $context = cluster2 ]]; then
+    sed -i "/spec:/a \ \ submariner_servicecidr: $serviceCidr_cluster2" $cr_file
+    sed -i "/spec:/a \ \ submariner_clustercidr: $clusterCidr_cluster2" $cr_file
+  elif [[ $context = cluster3 ]]; then
+    sed -i "/spec:/a \ \ submariner_servicecidr: $serviceCidr_cluster3" $cr_file
+    sed -i "/spec:/a \ \ submariner_clustercidr: $clusterCidr_cluster3" $cr_file
+  fi
 
   # These all need to end up in pod containers/submariner vars
   sed -i "/spec:/a \ \ image: $subm_routeagent_image_repo:$subm_routeagent_image_tag" $cr_file

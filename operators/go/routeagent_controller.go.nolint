@@ -157,6 +157,8 @@ func newPodForCR(cr *submarinerv1alpha1.Routeagent) *corev1.Pod {
 						{Name: "SUBMARINER_NAMESPACE", Value: cr.Spec.SubmarinerNamespace},
 						{Name: "SUBMARINER_CLUSTERID", Value: cr.Spec.SubmarinerClusterid},
 						{Name: "SUBMARINER_DEBUG", Value: cr.Spec.SubmarinerDebug},
+						{Name: "SUBMARINER_CLUSTERCIDR", Value: cr.Spec.SubmarinerClustercidr},
+						{Name: "SUBMARINER_SERVICECIDR", Value: cr.Spec.SubmarinerServicecidr},
 					},
 				},
 			},

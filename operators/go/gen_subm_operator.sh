@@ -114,6 +114,8 @@ function add_subm_routeagent_to_operator() {
   sed -i '/RouteagentSpec struct/a \ \ SubmarinerNamespace string `json:"submariner_namespace"`' $types_file
   sed -i '/RouteagentSpec struct/a \ \ SubmarinerClusterid string `json:"submariner_clusterid"`' $types_file
   sed -i '/RouteagentSpec struct/a \ \ SubmarinerDebug string `json:"submariner_debug"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ SubmarinerClustercidr string `json:"submariner_clustercidr"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ SubmarinerServicecidr string `json:"submariner_servicecidr"`' $types_file
 
   # Define status fields
   # TODO: Is this needed/right or legacy?
