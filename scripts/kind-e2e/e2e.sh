@@ -461,17 +461,20 @@ elif [[ $5 = helm ]]; then
     helm=true
     setup_cluster2_gateway
     setup_cluster3_gateway
-#    for i in 2 3; do
-#      context=cluster$i
-#      kubectl config use-context $context
-#
-#      verify_subm_engine_pod
-#      verify_subm_routeagent_pod
-#      verify_subm_engine_container
-#      verify_subm_routeagent_container
-#      verify_subm_engine_secrets
-#      verify_subm_routeagent_secrets
-#    done
+    for i in 2 3; do
+      context=cluster$i
+      kubectl config use-context $context
+
+      # The Helm deploy doesn't respect namespace config, hardcode to what it uses
+      subm_ns=submariner
+
+      verify_subm_engine_pod
+      verify_subm_routeagent_pod
+      verify_subm_engine_container
+      verify_subm_routeagent_container
+      verify_subm_engine_secrets
+      verify_subm_routeagent_secrets
+    done
 fi
 
 test_connection
