@@ -77,9 +77,8 @@ function add_subm_engine_to_operator() {
   sed -i '/SubmarinerSpec struct/a \ \ CeIpsecPsk string `json:"ce_ipsec_psk"`' $types_file
   sed -i '/SubmarinerSpec struct/a \ \ CeIpsecDebug string `json:"ce_ipsec_debug"`' $types_file
 
-  # Define status fields
-  # TODO: Is this needed/right or legacy?
-  sed -i '/SubmarinerStatus struct/a \ \ PodNames []string `json:"pod_names"`' $types_file
+  # Define status fields, commented example:
+  # sed -i '/SubmarinerStatus struct/a \ \ PodNames []string `json:"pod_names"`' $types_file
 
   # Fix formatting of types file
   go fmt $types_file
