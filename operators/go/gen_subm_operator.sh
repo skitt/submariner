@@ -8,7 +8,6 @@ export GO111MODULE=on
 GOPATH=$HOME/go
 
 version=0.0.1
-openapi_checks_enabled=false
 push_image=false
 op_dir=$GOPATH/src/github.com/submariner-operator/submariner-operator
 op_gen_dir=$(pwd)
@@ -61,23 +60,23 @@ function add_subm_engine_to_operator() {
   # Define spec fields
   types_file=pkg/apis/submariner/v1alpha1/submariner_types.go
   sed -i '/SubmarinerSpec struct/a \ \ Count int32 `json:"count"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerNamespace string `json:"submariner_namespace"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerClustercidr string `json:"submariner_clustercidr"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerServicecidr string `json:"submariner_servicecidr"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerToken string `json:"submariner_token"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerClusterid string `json:"submariner_clusterid"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerColorcodes string `json:"submariner_colorcodes"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerDebug string `json:"submariner_debug"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerNatenabled string `json:"submariner_natenabled"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ SubmarinerBroker string `json:"submariner_broker"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sApiserver string `json:"broker_k8s_apiserver"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sApiservertoken string `json:"broker_k8s_apiservertoken"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sRemotenamespace string `json:"broker_k8s_remotenamespace"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sCa string `json:"broker_k8s_ca"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ CeIpsecPsk string `json:"ce_ipsec_psk"`' $types_file
-  sed -i '/SubmarinerSpec struct/a \ \ CeIpsecDebug string `json:"ce_ipsec_debug"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ Namespace string `json:"namespace"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ ClusterCIDR string `json:"clusterCIDR"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ ServiceCIDR string `json:"serviceCIDR"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ Token string `json:"token"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ ClusterID string `json:"clusterID"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ ColorCodes string `json:"colorCodes"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ Debug string `json:"debug"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ NatEnabled string `json:"natEnabled"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ Broker string `json:"broker"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sApiServer string `json:"brokerK8sApiServer"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sApiServerToken string `json:"brokerK8sApiServerToken"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sRemoteNamespace string `json:"brokerK8sRemoteNamespace"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ BrokerK8sCA string `json:"brokerK8sCA"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ CeIpsecPSK string `json:"ceIPSecPSK"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ CeIpsecDebug string `json:"ceIPSecDebug"`' $types_file
 
-  # Define status fields, commented example:
+  # Define status fields, commented example
   # sed -i '/SubmarinerStatus struct/a \ \ PodNames []string `json:"pod_names"`' $types_file
 
   # Fix formatting of types file
@@ -88,11 +87,7 @@ function add_subm_engine_to_operator() {
 
   # Must rebuild after modifying types file
   operator-sdk generate k8s
-  if [[ $openapi_checks_enabled = true ]]; then
-    operator-sdk generate openapi
-  else
-    operator-sdk generate openapi || true
-  fi
+  operator-sdk generate openapi
 
   operator-sdk add controller --api-version=$api_version --kind=$kind
 
@@ -111,11 +106,12 @@ function add_subm_routeagent_to_operator() {
 
   # Define spec fields
   types_file=pkg/apis/submariner/v1alpha1/routeagent_types.go
-  sed -i '/RouteagentSpec struct/a \ \ SubmarinerNamespace string `json:"submariner_namespace"`' $types_file
-  sed -i '/RouteagentSpec struct/a \ \ SubmarinerClusterid string `json:"submariner_clusterid"`' $types_file
-  sed -i '/RouteagentSpec struct/a \ \ SubmarinerDebug string `json:"submariner_debug"`' $types_file
-  sed -i '/RouteagentSpec struct/a \ \ SubmarinerClustercidr string `json:"submariner_clustercidr"`' $types_file
-  sed -i '/RouteagentSpec struct/a \ \ SubmarinerServicecidr string `json:"submariner_servicecidr"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ Namespace string `json:"namespace"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ ClusterID string `json:"clusterID"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ Debug string `json:"debug"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ ClusterCIDR string `json:"clusterCIDR"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ ServiceCIDR string `json:"serviceCIDR"`' $types_file
+
 
   # Define status fields
   # TODO: Is this needed/right or legacy?

@@ -46,9 +46,9 @@ function verify_subm_crd() {
   kubectl get crd $crd_name -o jsonpath='{.spec.names.kind}' | grep Submariner
 
   if [[ $openapi_checks_enabled = true ]]; then
-    kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep ceIpsecDebug
-    kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep ceIpsecPsk
-    kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep brokerK8sCa
+    kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep ceIPSecDebug
+    kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep ceIPSecPSK
+    kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep brokerK8sCA
     kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep brokerK8sRemotenamespace
     kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep brokerK8sApiservertoken
     kubectl get crd $crd_name -o jsonpath='{.spec.validation.openAPIV3Schema.properties.spec.required}' | grep brokerK8sApiserver
@@ -134,29 +134,29 @@ function verify_subm_cr() {
   kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.apiVersion}' | grep submariner.io/v1alpha1
   kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.kind}' | grep Submariner
   kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.metadata.name}' | grep $deployment_name
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{..spec.broker_k8s_apiserver}' | grep $SUBMARINER_BROKER_URL
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.broker_k8s_apiservertoken}' | grep $SUBMARINER_BROKER_TOKEN
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.broker_k8s_ca}' | grep $SUBMARINER_BROKER_CA
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.broker_k8s_remotenamespace}' | grep $SUBMARINER_BROKER_NS
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.ce_ipsec_debug}' | grep $ce_ipsec_debug
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{..spec.brokerK8sApiServer}' | grep $SUBMARINER_BROKER_URL
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.brokerK8sApiServerToken}' | grep $SUBMARINER_BROKER_TOKEN
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.brokerK8sCA}' | grep $SUBMARINER_BROKER_CA
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.brokerK8sRemoteNamespace}' | grep $SUBMARINER_BROKER_NS
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.ceIPSecDebug}' | grep $ce_ipsec_debug
   # FIXME: Sometimes this changes between runs, causes failures
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.ce_ipsec_psk}' | grep $SUBMARINER_PSK || true
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.ceIPSecPSK}' | grep $SUBMARINER_PSK || true
   kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.image}' | grep $subm_engine_image_repo:$subm_engine_image_tag
   kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.size}' | grep $subm_engine_size
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_broker}' | grep $subm_broker
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clusterid}' | grep $context
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_colorcodes}' | grep $subm_colorcodes
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_debug}' | grep $subm_debug
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_namespace}' | grep $subm_ns
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_natenabled}' | grep $natEnabled
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.broker}' | grep $subm_broker
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.clusterID}' | grep $context
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.colorCodes}' | grep $subm_colorcodes
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.debug}' | grep $subm_debug
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.namespace}' | grep $subm_ns
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.natEnabled}' | grep $natEnabled
   if [[ $context = cluster2 ]]; then
-    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_servicecidr}' | grep $serviceCidr_cluster2
-    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clustercidr}' | grep $clusterCidr_cluster2
+    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.serviceCIDR}' | grep $serviceCIDR_cluster2
+    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.clusterCIDR}' | grep $clusterCIDR_cluster2
   elif [[ $context = cluster3 ]]; then
-    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_servicecidr}' | grep $serviceCidr_cluster3
-    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clustercidr}' | grep $clusterCidr_cluster3
+    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.serviceCIDR}' | grep $serviceCIDR_cluster3
+    kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.clusterCIDR}' | grep $clusterCIDR_cluster3
   fi
-  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_token}' | grep $subm_token
+  kubectl get submariner $deployment_name --namespace=$subm_ns -o jsonpath='{.spec.token}' | grep $subm_token
 }
 
 function verify_routeagent_cr() {
@@ -171,16 +171,16 @@ function verify_routeagent_cr() {
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.apiVersion}' | grep submariner.io/v1alpha1
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.kind}' | grep Routeagent
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.metadata.name}' | grep $routeagent_deployment_name
-  kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clusterid}' | grep $context
+  kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.clusterID}' | grep $context
   kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.image}' | grep $subm_routeagent_image_repo:$subm_routeagent_image_tag
-  kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_namespace}' | grep $subm_ns
-  kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_debug}' | grep $subm_debug
+  kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.namespace}' | grep $subm_ns
+  kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.debug}' | grep $subm_debug
   if [[ $context = cluster2 ]]; then
-    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_servicecidr}' | grep $serviceCidr_cluster2
-    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clustercidr}' | grep $clusterCidr_cluster2
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.serviceCIDR}' | grep $serviceCIDR_cluster2
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.clusterCIDR}' | grep $clusterCIDR_cluster2
   elif [[ $context = cluster3 ]]; then
-    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_servicecidr}' | grep $serviceCidr_cluster3
-    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.submariner_clustercidr}' | grep $clusterCidr_cluster3
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.serviceCIDR}' | grep $serviceCIDR_cluster3
+    kubectl get routeagent $routeagent_deployment_name --namespace=$subm_ns -o jsonpath='{.spec.clusterCIDR}' | grep $clusterCIDR_cluster3
   fi
 }
 
@@ -213,11 +213,11 @@ function verify_subm_engine_pod() {
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}'
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_NAMESPACE value:$subm_ns"
   if [[ $context = cluster2 ]]; then
-    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCidr_cluster2"
-    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCidr_cluster2"
+    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCIDR_cluster2"
+    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCIDR_cluster2"
   elif [[ $context = cluster3 ]]; then
-    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCidr_cluster3"
-    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCidr_cluster3"
+    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCIDR_cluster3"
+    kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCIDR_cluster3"
   fi
   if [ "$deploy_operator" = true ]; then
     kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_TOKEN value:$subm_token"
@@ -237,6 +237,7 @@ function verify_subm_engine_pod() {
   # FIXME: This changes between some deployment runs and causes failures
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:CE_IPSEC_PSK value:$SUBMARINER_PSK" || true
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:CE_IPSEC_DEBUG value:$ce_ipsec_debug"
+
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.status.phase}' | grep Running
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.metadata.namespace}' | grep $subm_ns
 }
@@ -247,7 +248,7 @@ function verify_subm_routeagent_pod() {
   # Loop tests over all routeagent pods
   subm_routeagent_pod_names=$(kubectl get pods --namespace=$subm_ns -l app=$routeagent_deployment_name -o=jsonpath='{.items..metadata.name}')
   # Globing-safe method, but -a flag gives me trouble in ZSH for some reason
-  read -ra subm_routeagent_pod_names_array <<<"$subm_routeagent_pod_names"
+  read -ra subm_routeagent_pod_names_array <<< "$subm_routeagent_pod_names"
   # TODO: Fail if there are zero routeagent pods
   for subm_routeagent_pod_name in "${subm_routeagent_pod_names_array[@]}"; do
     echo "Testing Submariner routeagent pod $subm_routeagent_pod_name"
@@ -262,11 +263,11 @@ function verify_subm_routeagent_pod() {
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERID value:$context"
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_DEBUG value:$subm_debug"
     if [[ $context = cluster2 ]]; then
-      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCidr_cluster2"
-      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCidr_cluster2"
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCIDR_cluster2"
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCIDR_cluster2"
     elif [[ $context = cluster3 ]]; then
-      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCidr_cluster3"
-      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCidr_cluster3"
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_SERVICECIDR value:$serviceCIDR_cluster3"
+      kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..env}' | grep "name:SUBMARINER_CLUSTERCIDR value:$clusterCIDR_cluster3"
     fi
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..volumeMounts}' | grep "mountPath:/host"
     kubectl get pod $subm_routeagent_pod_name --namespace=$subm_ns -o jsonpath='{.spec.containers..volumeMounts}' | grep "name:host-slash"
@@ -326,11 +327,11 @@ function verify_subm_engine_container() {
   kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "BROKER_K8S_APISERVERTOKEN=$SUBMARINER_BROKER_TOKEN"
   kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "BROKER_K8S_REMOTENAMESPACE=$SUBMARINER_BROKER_NS"
   if [[ $context = cluster2 ]]; then
-    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCidr_cluster2"
-    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCidr_cluster2"
+    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCIDR_cluster2"
+    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCIDR_cluster2"
   elif [[ $context = cluster3 ]]; then
-    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCidr_cluster3"
-    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCidr_cluster3"
+    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCIDR_cluster3"
+    kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCIDR_cluster3"
   fi
   if [ "$deploy_operator" = true ]; then
     kubectl exec -it $subm_engine_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_TOKEN=$subm_token"
@@ -378,11 +379,11 @@ function verify_subm_routeagent_container() {
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERID=$context"
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_DEBUG=$subm_debug"
     if [[ $context = cluster2 ]]; then
-      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCidr_cluster2"
-      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCidr_cluster2"
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCIDRcluster2"
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCIDR_cluster2"
     elif [[ $context = cluster3 ]]; then
-      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCidr_cluster3"
-      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCidr_cluster3"
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_SERVICECIDR=$serviceCIDR_cluster3"
+      kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "SUBMARINER_CLUSTERCIDR=$clusterCIDR_cluster3"
     fi
     kubectl exec -it $subm_routeagent_pod_name --namespace=$subm_ns -- env | grep "HOME=/root"
 

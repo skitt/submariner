@@ -220,10 +220,10 @@ function create_subm_vars() {
   routeagent_deployment_name=submariner-routeagent
   broker_deployment_name=submariner-k8s-broker
 
-  clusterCidr_cluster2=10.245.0.0/16
-  clusterCidr_cluster3=10.246.0.0/16
-  serviceCidr_cluster2=100.95.0.0/16
-  serviceCidr_cluster3=100.96.0.0/16
+  clusterCIDR_cluster2=10.245.0.0/16
+  clusterCIDR_cluster3=10.246.0.0/16
+  serviceCIDR_cluster2=100.95.0.0/16
+  serviceCIDR_cluster3=100.96.0.0/16
   natEnabled=false
   subm_routeagent_image_repo=submariner-route-agent
   subm_routeagent_image_tag=local

@@ -166,29 +166,29 @@ function create_subm_cr() {
   sed -i "/spec:/a \ \ size: $subm_engine_size" $cr_file
 
   # These all need to end up in pod container/environment vars
-  sed -i "/spec:/a \ \ submariner_namespace: $subm_ns" $cr_file
+  sed -i "/spec:/a \ \ namespace: $subm_ns" $cr_file
   if [[ $context = cluster2 ]]; then
-    sed -i "/spec:/a \ \ submariner_servicecidr: $serviceCidr_cluster2" $cr_file
-    sed -i "/spec:/a \ \ submariner_clustercidr: $clusterCidr_cluster2" $cr_file
+    sed -i "/spec:/a \ \ serviceCIDR: $serviceCIDR_cluster2" $cr_file
+    sed -i "/spec:/a \ \ clusterCIDR: $clusterCIDR_cluster2" $cr_file
   elif [[ $context = cluster3 ]]; then
-    sed -i "/spec:/a \ \ submariner_servicecidr: $serviceCidr_cluster3" $cr_file
-    sed -i "/spec:/a \ \ submariner_clustercidr: $clusterCidr_cluster3" $cr_file
+    sed -i "/spec:/a \ \ serviceCIDR: $serviceCIDR_cluster3" $cr_file
+    sed -i "/spec:/a \ \ clusterCIDR: $clusterCIDR_cluster3" $cr_file
   fi
-  sed -i "/spec:/a \ \ submariner_token: $subm_token" $cr_file
-  sed -i "/spec:/a \ \ submariner_clusterid: $context" $cr_file
-  sed -i "/spec:/a \ \ submariner_colorcodes: $subm_colorcodes" $cr_file
+  sed -i "/spec:/a \ \ token: $subm_token" $cr_file
+  sed -i "/spec:/a \ \ clusterID: $context" $cr_file
+  sed -i "/spec:/a \ \ colorCodes: $subm_colorcodes" $cr_file
   # NB: Quoting bool-like vars is required or Go will type as bool and fail when set as env vars as strs
-  sed -i "/spec:/a \ \ submariner_debug: \"$subm_debug\"" $cr_file
+  sed -i "/spec:/a \ \ debug: \"$subm_debug\"" $cr_file
   # NB: Quoting bool-like vars is required or Go will type as bool and fail when set as env vars as strs
-  sed -i "/spec:/a \ \ submariner_natenabled: \"$natEnabled\"" $cr_file
-  sed -i "/spec:/a \ \ submariner_broker: $subm_broker" $cr_file
-  sed -i "/spec:/a \ \ broker_k8s_apiserver: $SUBMARINER_BROKER_URL" $cr_file
-  sed -i "/spec:/a \ \ broker_k8s_apiservertoken: $SUBMARINER_BROKER_TOKEN" $cr_file
-  sed -i "/spec:/a \ \ broker_k8s_remotenamespace: $SUBMARINER_BROKER_NS" $cr_file
-  sed -i "/spec:/a \ \ broker_k8s_ca: $SUBMARINER_BROKER_CA" $cr_file
-  sed -i "/spec:/a \ \ ce_ipsec_psk: $SUBMARINER_PSK" $cr_file
+  sed -i "/spec:/a \ \ natEnabled: \"$natEnabled\"" $cr_file
+  sed -i "/spec:/a \ \ broker: $subm_broker" $cr_file
+  sed -i "/spec:/a \ \ brokerK8sApiServer: $SUBMARINER_BROKER_URL" $cr_file
+  sed -i "/spec:/a \ \ brokerK8sApiServerToken: $SUBMARINER_BROKER_TOKEN" $cr_file
+  sed -i "/spec:/a \ \ brokerK8sRemoteNamespace: $SUBMARINER_BROKER_NS" $cr_file
+  sed -i "/spec:/a \ \ brokerK8sCA: $SUBMARINER_BROKER_CA" $cr_file
+  sed -i "/spec:/a \ \ ceIPSecPSK: $SUBMARINER_PSK" $cr_file
   # NB: Quoting bool-like vars is required or Go will type as bool and fail when set as env vars as strs
-  sed -i "/spec:/a \ \ ce_ipsec_debug: \"$ce_ipsec_debug\"" $cr_file
+  sed -i "/spec:/a \ \ ceIPSecDebug: \"$ce_ipsec_debug\"" $cr_file
   sed -i "/spec:/a \ \ image: $subm_engine_image_repo:$subm_engine_image_tag" $cr_file
 
   # Show completed CR file for debugging help
@@ -207,15 +207,15 @@ function create_routeagent_cr() {
   sed -i "s|name: example-routeagent|name: $routeagent_deployment_name|g" $cr_file
 
   # These all need to end up in pod container/environment vars
-  sed -i "/spec:/a \ \ submariner_namespace: $subm_ns" $cr_file
-  sed -i "/spec:/a \ \ submariner_clusterid: $context" $cr_file
-  sed -i "/spec:/a \ \ submariner_debug: \"$subm_debug\"" $cr_file
+  sed -i "/spec:/a \ \ namespace: $subm_ns" $cr_file
+  sed -i "/spec:/a \ \ clusterID: $context" $cr_file
+  sed -i "/spec:/a \ \ debug: \"$subm_debug\"" $cr_file
   if [[ $context = cluster2 ]]; then
-    sed -i "/spec:/a \ \ submariner_servicecidr: $serviceCidr_cluster2" $cr_file
-    sed -i "/spec:/a \ \ submariner_clustercidr: $clusterCidr_cluster2" $cr_file
+    sed -i "/spec:/a \ \ serviceCIDR: $serviceCIDR_cluster2" $cr_file
+    sed -i "/spec:/a \ \ clusterCIDR: $clusterCIDR_cluster2" $cr_file
   elif [[ $context = cluster3 ]]; then
-    sed -i "/spec:/a \ \ submariner_servicecidr: $serviceCidr_cluster3" $cr_file
-    sed -i "/spec:/a \ \ submariner_clustercidr: $clusterCidr_cluster3" $cr_file
+    sed -i "/spec:/a \ \ serviceCIDR: $serviceCIDR_cluster3" $cr_file
+    sed -i "/spec:/a \ \ clusterCIDR: $clusterCIDR_cluster3" $cr_file
   fi
 
   # These all need to end up in pod containers/submariner vars
