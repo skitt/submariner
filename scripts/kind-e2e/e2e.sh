@@ -449,6 +449,8 @@ if [ "$deploy_operator" = true ]; then
       deploy_routeagent_cr
       # Verify Routeagent CR
       verify_routeagent_cr
+      # Verify SubM Routeagent DaemonSet
+      verify_subm_routeagent_daemonset
       # Verify SubM Routeagent Pods
       verify_subm_routeagent_pod
       # Verify SubM Routeagent container
@@ -471,6 +473,7 @@ elif [[ $5 = helm ]]; then
       subm_ns=submariner
 
       verify_subm_engine_pod
+      verify_subm_routeagent_daemonset
       verify_subm_routeagent_pod
       verify_subm_engine_container
       verify_subm_routeagent_container

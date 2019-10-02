@@ -93,7 +93,6 @@ func (r *ReconcileRouteagent) Reconcile(request reconcile.Request) (reconcile.Re
 		return reconcile.Result{}, err
 	}
 
-	// Define a new Pod object
 	daemonSet := newRouteAgentDaemonSet(instance)
 
 	// Set Routeagent instance as the owner and controller
@@ -101,9 +100,7 @@ func (r *ReconcileRouteagent) Reconcile(request reconcile.Request) (reconcile.Re
 		return reconcile.Result{}, err
 	}
 
-	// Check if this Pod already exists
 	found := &appsv1.DaemonSet{}
-
 	err = r.client.Get(context.TODO(), types.NamespacedName{Name: daemonSet.Name, Namespace: daemonSet.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
 		reqLogger.Info("Creating a new DaemonSet", "DaemonSet.Namespace", daemonSet.Namespace, "DaemonSet.Name", daemonSet.Name)
@@ -112,13 +109,11 @@ func (r *ReconcileRouteagent) Reconcile(request reconcile.Request) (reconcile.Re
 			return reconcile.Result{}, err
 		}
 
-		// Pod created successfully - don't requeue
 		return reconcile.Result{}, nil
 	} else if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Pod already exists - don't requeue
 	reqLogger.Info("Skip reconcile: DaemonSet already exists", "DaemonSet.Namespace", found.Namespace, "DaemonSet.Name", found.Name)
 	return reconcile.Result{}, nil
 }
@@ -155,8 +150,7 @@ func newRouteAgentDaemonSet(cr *submarinerv1alpha1.Routeagent) *appsv1.DaemonSet
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name: "submariner-routeagent",
-							// TODO: Use var here
+							Name:  "submariner-routeagent",
 							Image: "submariner-route-agent:local",
 							// FIXME: Should be entrypoint script, find/use correct file for routeagent
 							Command:         []string{"submariner-route-agent.sh"},

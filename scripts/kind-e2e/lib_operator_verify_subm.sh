@@ -247,8 +247,33 @@ function verify_subm_engine_pod() {
 
 function verify_subm_routeagent_daemonset() {
   # Simple verification to ensure that the routeagent daemonset has been created and becomes ready
-  kubectl wait --for=condition=Ready DaemonSets -l app=$routeagent_deployment_name --timeout=120s --namespace=$subm_ns
-  # the pod-checking function will do the rest
+   SECONDS="0"
+   while ! kubectl get DaemonSets -l app=$routeagent_deployment_name -n $subm_ns | grep -q submariner-; do
+     if [ $SECONDS -gt 120 ]; then
+        echo "Timeout waiting for route agent DaemonSet creation"
+        exit 1
+     else
+        ((SECONDS+=2))
+        sleep 2
+     fi
+   done
+
+   numberReady=-1
+   desiredNumberScheduled=0
+   SECONDS="0"
+   while [ "$numberReady" != "$desiredNumberScheduled" ] || [ $numberReady -le 1 ]; do
+     if [ $SECONDS -gt 120 ]; then
+        echo "Timeout waiting for a ready state on the daemonset"
+        exit 1
+     else
+
+        desiredNumberScheduled=$(kubectl get DaemonSet submariner-routeagent -n $subm_ns -o jsonpath='{.status.desiredNumberScheduled}')
+        numberReady=$(kubectl get DaemonSet submariner-routeagent -n $subm_ns -o jsonpath='{.status.numberReady}')
+
+        ((SECONDS+=2))
+        sleep 2
+     fi
+   done
 }
 
 function verify_subm_routeagent_pod() {
