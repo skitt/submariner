@@ -245,6 +245,12 @@ function verify_subm_engine_pod() {
   kubectl get pod $subm_engine_pod_name --namespace=$subm_ns -o jsonpath='{.metadata.namespace}' | grep $subm_ns
 }
 
+function verify_subm_routeagent_daemonset() {
+  # Simple verification to ensure that the routeagent daemonset has been created and becomes ready
+  kubectl wait --for=condition=Ready DaemonSets -l app=$routeagent_deployment_name --timeout=120s --namespace=$subm_ns
+  # the pod-checking function will do the rest
+}
+
 function verify_subm_routeagent_pod() {
   kubectl wait --for=condition=Ready pods -l app=$routeagent_deployment_name --timeout=120s --namespace=$subm_ns
 

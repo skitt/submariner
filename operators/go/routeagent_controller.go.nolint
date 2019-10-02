@@ -3,6 +3,8 @@ package routeagent
 import (
 	"context"
 
+	appsv1 "k8s.io/api/apps/v1"
+
 	submarinerv1alpha1 "github.com/submariner-operator/submariner-operator/pkg/apis/submariner/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -92,19 +94,20 @@ func (r *ReconcileRouteagent) Reconcile(request reconcile.Request) (reconcile.Re
 	}
 
 	// Define a new Pod object
-	pod := newPodForCR(instance)
+	daemonSet := newRouteAgentDaemonSet(instance)
 
 	// Set Routeagent instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
+	if err := controllerutil.SetControllerReference(instance, daemonSet, r.scheme); err != nil {
 		return reconcile.Result{}, err
 	}
 
 	// Check if this Pod already exists
-	found := &corev1.Pod{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: pod.Name, Namespace: pod.Namespace}, found)
+	found := &appsv1.DaemonSet{}
+
+	err = r.client.Get(context.TODO(), types.NamespacedName{Name: daemonSet.Name, Namespace: daemonSet.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-		err = r.client.Create(context.TODO(), pod)
+		reqLogger.Info("Creating a new DaemonSet", "DaemonSet.Namespace", daemonSet.Namespace, "DaemonSet.Name", daemonSet.Name)
+		err = r.client.Create(context.TODO(), daemonSet)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -116,58 +119,70 @@ func (r *ReconcileRouteagent) Reconcile(request reconcile.Request) (reconcile.Re
 	}
 
 	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Pod already exists", "Pod.Namespace", found.Namespace, "Pod.Name", found.Name)
+	reqLogger.Info("Skip reconcile: DaemonSet already exists", "DaemonSet.Namespace", found.Namespace, "DaemonSet.Name", found.Name)
 	return reconcile.Result{}, nil
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *submarinerv1alpha1.Routeagent) *corev1.Pod {
+func newRouteAgentDaemonSet(cr *submarinerv1alpha1.Routeagent) *appsv1.DaemonSet {
 	labels := map[string]string{
+		"app":       "submariner-routeagent",
+		"component": "routeagent",
+	}
+
+	matchLabels := map[string]string{
 		"app": "submariner-routeagent",
 	}
 
-	// Create SecurityContext for Pod
-	// FIXME: Does this really need to be ALL, vs just NET_ADMIN? The current Helm-based deployment gives ALL.
-	//security_context_net_admin_cap := corev1.SecurityContext{Capabilities: &corev1.Capabilities{Add: []corev1.Capability{"NET_ADMIN"}}}
-	// FIXME: Seems like these have to be a var, so can pass pointer to bool var to SecurityContext. Cleaner option?
 	allow_privilege_escalation := true
 	privileged := true
-	// TODO: Verify all these permissions are needed
-	security_context_all_cap_allow_escal := corev1.SecurityContext{Capabilities: &corev1.Capabilities{Add: []corev1.Capability{"ALL"}}, AllowPrivilegeEscalation: &allow_privilege_escalation, Privileged: &privileged}
+	security_context_all_cap_allow_escal := corev1.SecurityContext{
+		Capabilities:             &corev1.Capabilities{Add: []corev1.Capability{"ALL"}},
+		AllowPrivilegeEscalation: &allow_privilege_escalation,
+		Privileged:               &privileged}
 
-	return &corev1.Pod{
+	routeAgentDaemonSet := &appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
 			Namespace: cr.Namespace,
+			Name:      "submariner-routeagent",
 			Labels:    labels,
 		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name: "submariner-routeagent",
-					// TODO: Use var here
-					Image: "submariner-route-agent:local",
-					// FIXME: Should be entrypoint script, find/use correct file for routeagent
-					Command:         []string{"submariner-route-agent.sh"},
-					SecurityContext: &security_context_all_cap_allow_escal,
-					VolumeMounts: []corev1.VolumeMount{
-						{Name: "host-slash", MountPath: "/host", ReadOnly: true},
+		Spec: appsv1.DaemonSetSpec{
+			Selector: &metav1.LabelSelector{MatchLabels: matchLabels},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: labels,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name: "submariner-routeagent",
+							// TODO: Use var here
+							Image: "submariner-route-agent:local",
+							// FIXME: Should be entrypoint script, find/use correct file for routeagent
+							Command:         []string{"submariner-route-agent.sh"},
+							SecurityContext: &security_context_all_cap_allow_escal,
+							VolumeMounts: []corev1.VolumeMount{
+								{Name: "host-slash", MountPath: "/host", ReadOnly: true},
+							},
+							Env: []corev1.EnvVar{
+								{Name: "SUBMARINER_NAMESPACE", Value: cr.Spec.Namespace},
+								{Name: "SUBMARINER_CLUSTERID", Value: cr.Spec.ClusterID},
+								{Name: "SUBMARINER_DEBUG", Value: cr.Spec.Debug},
+								{Name: "SUBMARINER_CLUSTERCIDR", Value: cr.Spec.ClusterCIDR},
+								{Name: "SUBMARINER_SERVICECIDR", Value: cr.Spec.ServiceCIDR},
+							},
+						},
 					},
-					Env: []corev1.EnvVar{
-						{Name: "SUBMARINER_NAMESPACE", Value: cr.Spec.Namespace},
-						{Name: "SUBMARINER_CLUSTERID", Value: cr.Spec.ClusterID},
-						{Name: "SUBMARINER_DEBUG", Value: cr.Spec.Debug},
-						{Name: "SUBMARINER_CLUSTERCIDR", Value: cr.Spec.ClusterCIDR},
-						{Name: "SUBMARINER_SERVICECIDR", Value: cr.Spec.ServiceCIDR},
+					// TODO: Use SA submariner-routeagent or submariner?
+					ServiceAccountName: "submariner-operator",
+					HostNetwork:        true,
+					Volumes: []corev1.Volume{
+						{Name: "host-slash", VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/"}}},
 					},
 				},
 			},
-			// TODO: Use SA submariner-routeagent or submariner?
-			ServiceAccountName: "submariner-operator",
-			HostNetwork:        true,
-			Volumes: []corev1.Volume{
-				{Name: "host-slash", VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/"}}},
-			},
 		},
 	}
+
+	return routeAgentDaemonSet
 }
