@@ -153,8 +153,7 @@ func newPodForCR(cr *submarinerv1alpha1.Submariner) *corev1.Pod {
 			Containers: []corev1.Container{
 				{
 					Name: "submariner",
-					// TODO: Use var here
-					Image: "submariner:local",
+					Image: cr.Spec.Image,
 					// TODO: Use var here
 					Command:         []string{"submariner.sh"},
 					SecurityContext: &security_context_all_caps_privilaged,

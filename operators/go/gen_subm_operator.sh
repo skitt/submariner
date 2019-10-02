@@ -77,6 +77,7 @@ function add_subm_engine_to_operator() {
   sed -i '/SubmarinerSpec struct/a \ \ CeIPSecDebug string `json:"ceIPSecDebug"`' $types_file
   sed -i '/SubmarinerSpec struct/a \ \ CeIPSecIKEPort int `json:"ceIPSecIKEPort,omitempty"`' $types_file
   sed -i '/SubmarinerSpec struct/a \ \ CeIPSecNATTPort int `json:"ceIPSecNATTPort,omitempty"`' $types_file
+  sed -i '/SubmarinerSpec struct/a \ \ Image string `json:"image"`' $types_file
 
   # Define status fields, commented example
   # sed -i '/SubmarinerStatus struct/a \ \ PodNames []string `json:"pod_names"`' $types_file
@@ -113,6 +114,7 @@ function add_subm_routeagent_to_operator() {
   sed -i '/RouteagentSpec struct/a \ \ Debug string `json:"debug"`' $types_file
   sed -i '/RouteagentSpec struct/a \ \ ClusterCIDR string `json:"clusterCIDR"`' $types_file
   sed -i '/RouteagentSpec struct/a \ \ ServiceCIDR string `json:"serviceCIDR"`' $types_file
+  sed -i '/RouteagentSpec struct/a \ \ Image string `json:"image"`' $types_file
 
 
   # Define status fields

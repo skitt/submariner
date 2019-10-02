@@ -145,8 +145,7 @@ func newPodForCR(cr *submarinerv1alpha1.Routeagent) *corev1.Pod {
 			Containers: []corev1.Container{
 				{
 					Name: "submariner-routeagent",
-					// TODO: Use var here
-					Image: "submariner-route-agent:local",
+					Image: cr.Spec.Image,
 					// FIXME: Should be entrypoint script, find/use correct file for routeagent
 					Command:         []string{"submariner-route-agent.sh"},
 					SecurityContext: &security_context_all_cap_allow_escal,
