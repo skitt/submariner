@@ -4,7 +4,13 @@ set -ex
 version=${1:-dev}
 push_image=${2:-false}
 
-cd $(pwd)/submariner-operator
+cd $(dirname $0)
+
+if [ ! -d submariner-operator ]; then
+  ./gen_subm_operator.sh
+fi
+
+cd submariner-operator
 
 go mod vendor
 
