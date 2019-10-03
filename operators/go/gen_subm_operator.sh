@@ -7,6 +7,10 @@ export GOROOT
 export GO111MODULE=on
 GOPATH=$HOME/go
 
+# Rely on the Go proxy to accelerate downloads and avoid problems with
+# disappearing repositories
+export GOPROXY=https://proxy.golang.org
+
 version=0.0.1
 push_image=false
 op_dir=$GOPATH/src/github.com/submariner-operator/submariner-operator
