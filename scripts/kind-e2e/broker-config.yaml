@@ -1,7 +1,5 @@
 kind: Cluster
 apiVersion: kind.sigs.k8s.io/v1alpha3
-networking:
-  disableDefaultCNI: true
 kubeadmConfigPatches:
 - |
   apiVersion: kubeadm.k8s.io/v1beta1
@@ -9,10 +7,8 @@ kubeadmConfigPatches:
   metadata:
     name: config
   networking:
-    podSubnet: 10.245.0.0/16
-    serviceSubnet: 100.95.0.0/16
-    dnsDomain: cluster2.local
+    podSubnet: 10.244.0.0/16
+    serviceSubnet: 100.94.0.0/16
+    dnsDomain: broker.local
 nodes:
 - role: control-plane
-- role: worker
-- role: worker

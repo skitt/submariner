@@ -9,9 +9,9 @@ kubeadmConfigPatches:
   metadata:
     name: config
   networking:
-    podSubnet: 10.246.0.0/16
-    serviceSubnet: 100.96.0.0/16
-    dnsDomain: cluster3.local
+    podSubnet: 10.245.0.0/16
+    serviceSubnet: 100.95.0.0/16
+    dnsDomain: west.local
 nodes:
 - role: control-plane
 - role: worker
