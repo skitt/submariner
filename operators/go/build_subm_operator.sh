@@ -6,6 +6,9 @@ push_image=${2:-false}
 
 cd $(dirname $0)
 
+# gen_subm_operator.sh / the operator-sdk does not like vendoring mode we enable by default
+export GOFLAGS=""
+
 if [ ! -d submariner-operator ]; then
   ./gen_subm_operator.sh
 fi
