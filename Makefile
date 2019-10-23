@@ -13,6 +13,9 @@ TARGETS := $(shell ls scripts)
 	@./.dapper.tmp -v
 	@mv .dapper.tmp .dapper
 
+clean:
+	rm -rf bin dist output vendor package/strongswan-*
+
 $(TARGETS): .dapper
 	./.dapper -m bind $@ $(status) $(version) $(logging) $(kubefed) $(deploytool)
 
