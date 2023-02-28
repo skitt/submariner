@@ -26,13 +26,13 @@ import (
 	"time"
 
 	. "github.com/onsi/gomega"
-	"github.com/submariner-io/admiral/pkg/stringset"
 	"github.com/submariner-io/submariner/pkg/ipset"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 type IPSet struct {
 	mutex                    sync.Mutex
-	sets                     map[string]stringset.Interface
+	sets                     map[string]sets.Set[string]
 	failOnDestroySetMatchers []interface{}
 	failOnCreateSetMatchers  []interface{}
 	failOnAddEntryMatchers   []interface{}
@@ -43,7 +43,7 @@ var _ = ipset.Interface(&IPSet{})
 
 func New() *IPSet {
 	return &IPSet{
-		sets: map[string]stringset.Interface{},
+		sets: map[string]sets.Set[string]{},
 	}
 }
 
@@ -64,7 +64,7 @@ func (i *IPSet) CreateSet(set *ipset.IPSet, ignoreExistErr bool) error {
 		return fmt.Errorf("IP set %q already exists", set.Name)
 	}
 
-	i.sets[set.Name] = stringset.New()
+	i.sets[set.Name] = sets.New[string]()
 
 	return nil
 }
@@ -105,7 +105,7 @@ func (i *IPSet) DestroyAllSets() error {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
 
-	i.sets = map[string]stringset.Interface{}
+	i.sets = map[string]sets.Set[string]{}
 
 	return nil
 }
@@ -178,13 +178,13 @@ func (i *IPSet) ListSets() ([]string, error) {
 	i.mutex.Lock()
 	defer i.mutex.Unlock()
 
-	sets := []string{}
+	names := []string{}
 
 	for name := range i.sets {
-		sets = append(sets, name)
+		names = append(names, name)
 	}
 
-	return sets, nil
+	return names, nil
 }
 
 func (i *IPSet) GetVersion() (string, error) {
