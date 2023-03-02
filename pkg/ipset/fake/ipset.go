@@ -78,7 +78,7 @@ func (i *IPSet) FlushSet(set string) error {
 		return nil
 	}
 
-	entries.RemoveAll()
+	entries.Delete(entries.UnsortedList()...)
 
 	return nil
 }
@@ -124,9 +124,11 @@ func (i *IPSet) AddEntry(entry string, set *ipset.IPSet, ignoreExistErr bool) er
 		return fmt.Errorf("IP set %q does not exist", set.Name)
 	}
 
-	if !entries.Add(entry) && !ignoreExistErr {
+	if entries.Has(entry) && !ignoreExistErr {
 		return fmt.Errorf("entry %q already exists", entry)
 	}
+
+	entries.Insert(entry)
 
 	return nil
 }
@@ -145,7 +147,7 @@ func (i *IPSet) DelEntry(entry, set string) error {
 		return nil
 	}
 
-	entries.Remove(entry)
+	entries.Delete(entry)
 
 	return nil
 }
@@ -159,7 +161,7 @@ func (i *IPSet) TestEntry(entry, set string) (bool, error) {
 		return false, fmt.Errorf("IP set %q does not exist", set)
 	}
 
-	return entries.Contains(entry), nil
+	return entries.Has(entry), nil
 }
 
 func (i *IPSet) ListEntries(set string) ([]string, error) {
@@ -171,7 +173,7 @@ func (i *IPSet) ListEntries(set string) ([]string, error) {
 		return nil, fmt.Errorf("IP set %q does not exist", set)
 	}
 
-	return entries.Elements(), nil
+	return entries.UnsortedList(), nil
 }
 
 func (i *IPSet) ListSets() ([]string, error) {
@@ -200,7 +202,7 @@ func (i *IPSet) AddEntryWithOptions(entry *ipset.Entry, set *ipset.IPSet, ignore
 		return fmt.Errorf("IP set %q does not exist", set)
 	}
 
-	entries.Add(entry.String())
+	entries.Insert(entry.String())
 
 	return nil
 }

@@ -56,14 +56,14 @@ var _ = Describe("Remote subnet handling", func() {
 		})
 
 		It("should return missing elements to add", func() {
-			remoteSubnets.Remove(cluster1Net2)
+			remoteSubnets.Delete(cluster1Net2)
 			toAdd, toRemove := ovn.getNorthSubnetsToAddAndRemove(remoteSubnets)
 			Expect(toAdd).To(Equal([]string{cluster1Net2}))
 			Expect(toRemove).To(BeEmpty())
 		})
 
 		It("should return unexpected elements to remove", func() {
-			remoteSubnets.Add(unknownNet1)
+			remoteSubnets.Insert(unknownNet1)
 			toAdd, toRemove := ovn.getNorthSubnetsToAddAndRemove(remoteSubnets)
 			Expect(toAdd).To(BeEmpty())
 			Expect(toRemove).To(Equal([]string{unknownNet1}))
@@ -78,14 +78,14 @@ var _ = Describe("Remote subnet handling", func() {
 		})
 
 		It("should return missing elements to add", func() {
-			localSubnets.Remove(localNet1)
+			localSubnets.Delete(localNet1)
 			toAdd, toRemove := ovn.getSouthSubnetsToAddAndRemove(localSubnets)
 			Expect(toAdd).To(Equal([]string{localNet1}))
 			Expect(toRemove).To(BeEmpty())
 		})
 
 		It("should return unexpected elements to remove", func() {
-			localSubnets.Add(unknownNet1)
+			localSubnets.Insert(unknownNet1)
 			toAdd, toRemove := ovn.getSouthSubnetsToAddAndRemove(localSubnets)
 			Expect(toAdd).To(BeEmpty())
 			Expect(toRemove).To(Equal([]string{unknownNet1}))
