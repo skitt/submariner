@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	ipsetgo "github.com/lrh3321/ipset-go"
 	"github.com/pkg/errors"
 	"github.com/submariner-io/admiral/pkg/log"
 	submV1 "github.com/submariner-io/submariner/pkg/apis/submariner.io/v1"
@@ -169,6 +170,28 @@ func (h *mtuHandler) LocalEndpointCreated(endpoint *submV1.Endpoint) error {
 		}
 
 		h.forceMss = configured
+	}
+
+	handle, err := ipsetgo.NewHandle()
+	if err != nil {
+		return nil
+	}
+	defer handle.Close()
+
+	sets, err := handle.ListAll()
+	if err != nil {
+		return nil
+	}
+
+	logger.Info("Listing ipsets")
+
+	for i := range sets {
+		logger.Infof("Set %s, type %s", sets[i].SetName, sets[i].TypeName)
+
+		for j := range sets[i].Entries {
+			logger.Infof("Entry %s, IP %s, CIDR %d, interface %s", sets[i].Entries[j].Name, sets[i].Entries[j].IP.String(),
+				sets[i].Entries[j].CIDR, sets[i].Entries[j].IFace)
+		}
 	}
 
 	return nil
